@@ -9,7 +9,7 @@ body {
     max-width: 800px;
     margin: 0 auto;
     background: #ffffff;
-    padding: 40px;
+    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
@@ -27,7 +27,13 @@ h1, h2 {
 .user-info {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
     margin-bottom: 20px;
+}
+
+.user-info input {
+    flex: 1;
+    margin-right: 10px;
 }
 
 .form {
@@ -38,6 +44,7 @@ h1, h2 {
 .debt-plan,
 .monthly-payments {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     margin: 10px 0;
@@ -48,7 +55,8 @@ input, select {
     margin-right: 10px;
     border: 1px solid #ced4da;
     border-radius: 5px;
-    width: 20%;
+    flex: 1 1 45%; /* Занимает 45% ширины с возможностью сжатия */
+    min-width: 200px; /* Минимальная ширина для мобильных устройств */
     font-size: 14px;
 }
 
@@ -107,16 +115,27 @@ button:hover {
 }
 
 #categoryFilter {
-    width: 30%;
+    flex: 1 1 40%; /* Занимает 40% ширины */
 }
 
 @media (max-width: 600px) {
-    .transaction-inputs, .debt-plan, .monthly-payments {
+    .transaction-inputs,
+    .debt-plan,
+    .monthly-payments {
         flex-direction: column;
     }
 
     input, select, button {
         width: 100%;
         margin: 5px 0;
+    }
+
+    .user-info {
+        flex-direction: column;
+    }
+
+    .user-info input {
+        margin-bottom: 10px;
+        margin-right: 0; /* Убираем margin справа для мобильного режима */
     }
 }
