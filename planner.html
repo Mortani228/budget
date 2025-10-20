@@ -1,0 +1,443 @@
+<!-- planner.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Планировщик бюджета</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+        }
+        .balance {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f9f9f9;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .section h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .section h2 i {
+            margin-right: 10px;
+            color: #4ecdc4;
+        }
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+        input, select, button {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+        }
+        button {
+            background: #4ecdc4;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #26a69a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+        }
+        .delete-all {
+            background: #e74c3c;
+        }
+        .delete-all:hover {
+            background: #c0392b;
+        }
+        .filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .filter input {
+            flex: 1;
+            min-width: 200px;
+        }
+        .month-group {
+            margin-bottom: 20px;
+        }
+        .month-header {
+            font-weight: 600;
+            background: #4ecdc4;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .transaction, .saving-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s ease;
+        }
+        .transaction:hover, .saving-entry:hover {
+            background: #f1f3f4;
+        }
+        .income { color: #27ae60; font-weight: 500; }
+        .expense { color: #e74c3c; font-weight: 500; }
+        .saving-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .saving-item input {
+            flex: 1;
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            transition: background 0.3s ease;
+        }
+        .nav a:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            form {
+                grid-template-columns: 1fr;
+            }
+            .filter {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="index.html"><i class="fas fa-home"></i> Главная</a>
+        </div>
+        <h1><i class="fas fa-chart-bar"></i> Планировщик бюджета</h1>
+        <div class="balance">
+            Текущий баланс: <span id="balance">0</span> руб.
+        </div>
+        
+        <div class="section">
+            <h2><i class="fas fa-plus-circle"></i> Добавить транзакцию</h2>
+            <form id="transactionForm">
+                <select id="type">
+                    <option value="income">Доход</option>
+                    <option value="expense">Расход</option>
+                </select>
+                <input type="text" id="description" placeholder="Описание" required>
+                <input type="number" id="amount" placeholder="Сумма (руб.)" min="0" step="0.01" required>
+                <input type="date" id="date" required>
+                <button type="submit">Добавить</button>
+            </form>
+        </div>
+        
+        <div class="section">
+            <h2><i class="fas fa-search"></i> Фильтр транзакций</h2>
+            <div class="filter">
+                <input type="number" id="searchAmount" placeholder="Поиск по сумме (руб.)" min="0" step="0.01">
+                <button onclick="filterTransactions()">Фильтровать</button>
+                <button onclick="clearFilter()">Сбросить</button>
+                <button class="delete-all" onclick="deleteAllTransactions()">Удалить все</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><i class="fas fa-history"></i> История транзакций</h2>
+            <div id="transactionList"></div>
+        </div>
+        
+        <div class="section">
+            <h2><i class="fas fa-piggy-bank"></i> Отложения</h2>
+            <form id="savingsForm">
+                <div id="categories">
+                    <div class="saving-item">
+                        <input type="text" placeholder="Категория" required>
+                        <input type="number" placeholder="Сумма (руб.)" min="0" step="0.01" required>
+                        <button type="button" onclick="removeCategory(this)">Удалить</button>
+                    </div>
+                </div>
+                <button type="button" onclick="addCategory()">Добавить категорию</button>
+                <button type="submit">Добавить отложения</button>
+            </form>
+            <div id="savingsResult"></div>
+            <button class="delete-all" onclick="deleteAllSavings()">Удалить все отложения</button>
+        </div>
+        
+        <div class="section">
+            <h2><i class="fas fa-trash-alt"></i> Удалить транзакции за период</h2>
+            <select id="deleteMonth">
+                <option value="">Выберите месяц</option>
+                <option value="01">Январь</option>
+                <option value="02">Февраль</option>
+                <option value="03">Март</option>
+                <option value="04">Апрель</option>
+                <option value="05">Май</option>
+                <option value="06">Июнь</option>
+                <option value="07">Июль</option>
+                <option value="08">Август</option>
+                <option value="09">Сентябрь</option>
+                <option value="10">Октябрь</option>
+                <option value="11">Ноябрь</option>
+                <option value="12">Декабрь</option>
+            </select>
+            <input type="number" id="deleteYear" placeholder="Год" min="2000" max="2100">
+            <button onclick="deleteTransactionsByPeriod()">Удалить</button>
+        </div>
+    </div>
+
+    <script>
+        let balance = 0;
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let savings = JSON.parse(localStorage.getItem('savings')) || [];
+
+        const balanceEl = document.getElementById('balance');
+        const form = document.getElementById('transactionForm');
+        const list = document.getElementById('transactionList');
+        const savingsForm = document.getElementById('savingsForm');
+        const categoriesDiv = document.getElementById('categories');
+        const savingsResult = document.getElementById('savingsResult');
+
+        function updateBalance() {
+            const transactionBalance = transactions.reduce((sum, t) => {
+    return t.type === 'income' ? sum + t.amount : sum - t.amount;
+}, 0);
+const savingsTotal = savings.reduce((sum, s) => sum + s.amount, 0);
+balance = transactionBalance - savingsTotal;
+
+            balanceEl.textContent = balance.toFixed(2);
+            balanceEl.className = balance >= 0 ? 'positive' : 'negative';
+        }
+
+        function renderTransactions(filtered = transactions) {
+            list.innerHTML = '';
+            const grouped = {};
+            filtered.forEach(t => {
+                const date = new Date(t.date);
+                const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                if (!grouped[monthKey]) grouped[monthKey] = [];
+                grouped[monthKey].push(t);
+            });
+            Object.keys(grouped).sort().reverse().forEach(month => {
+                const monthDiv = document.createElement('div');
+                monthDiv.className = 'month-group';
+                const [year, monthNum] = month.split('-');
+                const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+                monthDiv.innerHTML = `<div class="month-header">${monthNames[parseInt(monthNum) - 1]} ${year}</div>`;
+                grouped[month].forEach((t, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'transaction';
+                    div.innerHTML = `
+                        <span>${t.description} (${t.type === 'income' ? 'Доход' : 'Расход'}) - ${t.date}</span>
+                        <span class="${t.type}">${t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)} руб.</span>
+                        <button onclick="deleteTransaction(${transactions.indexOf(t)})">Удалить</button>
+                    `;
+                    monthDiv.appendChild(div);
+                });
+                list.appendChild(monthDiv);
+            });
+        }
+
+        function deleteTransaction(index) {
+            transactions.splice(index, 1);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateBalance();
+            renderTransactions();
+        }
+
+        function deleteAllTransactions() {
+            if (confirm('Вы уверены, что хотите удалить ВСЕ транзакции? Это действие нельзя отменить.')) {
+                transactions = [];
+                localStorage.setItem('transactions', JSON.stringify(transactions));
+                updateBalance();
+                renderTransactions();
+            }
+        }
+
+        function filterTransactions() {
+            const searchAmount = parseFloat(document.getElementById('searchAmount').value);
+            if (isNaN(searchAmount)) {
+                renderTransactions();
+                return;
+            }
+            const filtered = transactions.filter(t => t.amount === searchAmount);
+            renderTransactions(filtered);
+        }
+
+        function clearFilter() {
+            document.getElementById('searchAmount').value = '';
+            renderTransactions();
+        }
+
+        function addCategory() {
+            const div = document.createElement('div');
+            div.className = 'saving-item';
+            div.innerHTML = `
+                <input type="text" placeholder="Категория" required>
+                <input type="number" placeholder="Сумма (руб.)" min="0" step="0.01" required>
+                <button type="button" onclick="removeCategory(this)">Удалить</button>
+            `;
+            categoriesDiv.appendChild(div);
+        }
+
+        function removeCategory(button) {
+            button.parentElement.remove();
+        }
+
+        savingsForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const items = Array.from(categoriesDiv.querySelectorAll('.saving-item')).map(div => {
+                return {
+                    category: div.querySelector('input[type="text"]').value,
+                    amount: parseFloat(div.querySelector('input[type="number"]').value)
+                };
+            });
+            savings.push(...items);
+            localStorage.setItem('savings', JSON.stringify(savings));
+            renderSavings();
+            savingsForm.reset();
+            categoriesDiv.innerHTML = `
+                <div class="saving-item">
+                    <input type="text" placeholder="Категория" required>
+                    <input type="number" placeholder="Сумма (руб.)" min="0" step="0.01" required>
+                    <button type="button" onclick="removeCategory(this)">Удалить</button>
+                </div>`;
+        });
+
+        function renderSavings() {
+            savingsResult.innerHTML = '';
+            if (savings.length === 0) {
+                savingsResult.textContent = 'Отложений пока нет.';
+                return;
+            }
+            savings.forEach((s, index) => {
+                const div = document.createElement('div');
+                div.className = 'saving-entry';
+                div.innerHTML = `
+                    <span>${s.category}: ${s.amount.toFixed(2)} руб.</span>
+                    <button onclick="deleteSaving(${index})">Удалить</button>
+                `;
+                savingsResult.appendChild(div);
+            });
+        }
+
+        function deleteSaving(index) {
+            savings.splice(index, 1);
+            localStorage.setItem('savings', JSON.stringify(savings));
+            renderSavings();
+        }
+
+        function deleteAllSavings() {
+            if (confirm('Удалить все отложения?')) {
+                savings = [];
+                localStorage.setItem('savings', JSON.stringify(savings));
+                renderSavings();
+            }
+        }
+
+        function deleteTransactionsByPeriod() {
+            const month = document.getElementById('deleteMonth').value;
+            const year = document.getElementById('deleteYear').value;
+            if (!month || !year) {
+                alert('Выберите месяц и год.');
+                return;
+            }
+            transactions = transactions.filter(t => {
+                const date = new Date(t.date);
+                return !(
+                    date.getMonth() + 1 === parseInt(month) &&
+                    date.getFullYear() === parseInt(year)
+                );
+            });
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateBalance();
+            renderTransactions();
+        }
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const type = document.getElementById('type').value;
+            const description = document.getElementById('description').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const date = document.getElementById('date').value;
+            if (!description || isNaN(amount) || !date) {
+                alert('Пожалуйста, заполните все поля корректно.');
+                return;
+            }
+            transactions.push({ type, description, amount, date });
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateBalance();
+            renderTransactions();
+            form.reset();
+        });
+
+        // Первичная отрисовка при загрузке
+        updateBalance();
+        renderTransactions();
+        renderSavings();
+    </script>
+</body>
+</html>
